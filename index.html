@@ -9,6 +9,7 @@
 			<br>
 			<H3 align="center"><a href="#proposal">1. Project Proposal</a></H3>
 			<H3 align="center"><a href="#preliminaryResults">2. Preliminary Results</a></H3>
+			<H3 align="center"><a href="#preliminaryResults2">3. Preliminary Results 2.0</a></H3>
 		</section>
 		<br>
 		<br>
@@ -82,7 +83,7 @@
 		<br>
 		<section>
 			<a name="preliminaryResults" />
-			<H2 align="center">Pre-liminary Results</H2>
+			<H2 align="center">Pre-liminary Results - Triangulation and Colouring</H2>
 		</section>
 		<br>
 		<section>
@@ -173,6 +174,88 @@
 			<p>[1] <i>Wikipedia - Graph Colouring.</i> <a href="https://en.wikipedia.org/wiki/Graph_coloring">Graph Colouring</a></p>
 			<p>[2] <i>University of Manchester - Discrete Maths.</i> <a href="http://www.maths.manchester.ac.uk/~mrm/Teaching/DiscreteMaths/LectureNotes/GraphColouring">Graph Colouring with the Greedy Method</a></p>
 			<p>[3] <i>UCSB - Computational Geometry.</i> <a href="https://www.cs.ucsb.edu/~suri/cs235/Triangulation.pdf">Polygon Triangulation and Colouring</a></p>
+		</section>
+		<br>
+		<br>
+		<hr>
+		<hr>
+		<hr>
+		<br>
+		<br>
+		<section>
+			<a name="preliminaryResults2" />
+			<H2 align="center">Pre-liminary Results - Guard Visibility Polygons</H2>
+		</section>
+		<br />
+		<section>
+			<H2 align="center">Program to determine the visibility polygon for a guard using ray casting</H2>
+			<br>
+			<p>
+				A very important portion of the AGP is the question of the visibility of each guard, i.e., the area inside the polygon actually visible to the guard.
+			</p>
+			<p>
+				In our program, we have assumed that the guard has infinite vision in all directions as long as there are no obstructions present.<br>
+				Our approach is to cast rays to all the vertices of the polygon that make up the art gallery in the problem and determine the visibility polygon
+				by combining the results. Any rays met with obstruction enroute to a target vertex, stop on the obstacle itself. Therefore, our solution
+				has no problems dealing with so-called 'holes' in the polygons. 
+			</p>
+			<p>
+				In order to produce a contrast between the guarded and unguarded spaces, we have used a grey colour to indicate unguarded external spaces,
+				a black colour to indicate unguarded art gallery spaces and a bright yellow to denote a reassuring and secure space (both internal and external).
+			</p>
+			<p>
+				We have created a bounding box around all the polygons to constrain vision of the guards.<br>
+				We intend to showcase this as an interactive application with the user able to drag around the 'guard' and easily picture visibility.<br>
+				Shown below is a selection of outputs from this program:
+			</p>
+			<br>
+			<br>
+			1) Crown -  A popular for art gallery problems. Visibility can vary drastically with position.
+			<p align="center">
+				<img src="images/Visibility1.png" alt="Visibiity 1">
+				<br>
+				<img src="images/Visibility2.png" alt="Visibiity 2">
+				<br>
+				<img src="images/Visibility3.png" alt="Visibiity 3">
+				<br>
+				<img src="images/Visibility4.png" alt="Visibiity 4">
+			</p>
+			<br>
+			<br>
+			2) Long, dark corridors - A polygon with 100 vertices.
+			<p align="center">
+				<img src="images/Visibility5.png" alt="Visibiity 5">
+				<br>
+				<img src="images/Visibility6.png" alt="Visibiity 6">
+				<br>
+				<img src="images/Visibility7.png" alt="Visibiity 7">
+			</p>
+			<br>
+			<br>
+			3) Several art galleries - An area with several art galleries, some already shown above, others newly added.
+			<p align="center">
+				<img src="images/Visibility8.png" alt="Visibiity 8">
+				<br>
+				<br>
+				<img src="images/Visibility9.png" alt="Visibiity 9">
+				<br>
+				<br>
+				<img src="images/Visibility10.png" alt="Visibiity 10">
+				<br>
+				<br>
+				<img src="images/Visibility11.png" alt="Visibiity 11">
+			</p>
+		</section>
+		<section>
+			<p>
+				The program was written in Javascript and HTML5 using Canvas.
+			</p>
+		</section>
+		<section>
+			<H2>References</H2>
+			<p>[1] <i>Wikipedia - Visibility Polygon.</i> <a href="https://en.wikipedia.org/wiki/Visibility_polygon">Visibility Polygon</a></p>
+			<p>[2] <i> Joseph O'Rourke.  </i><a href="http://cs.smith.edu/~jorourke/books/ArtGalleryTheorems/art.html">Art Gallery Theorems and Algorithms.</a></p>
+			<p>[3] <i>Red Blog Games.</i> <a href="https://www.redblobgames.com/articles/visibility/">2D Visibility</a></p>
 		</section>
 	</body>
 </html>
