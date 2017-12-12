@@ -297,15 +297,15 @@
 		<section>
 			<H2 align="center">Background</H2>
 			<p align="justify">
-				The polygons usually considered as part of this problem are all termed ‘simple’. Simple polygons possess the following properties: they enclose a region with a definite, measurable area, their edges meet only at the ends, no more than two edges meet at a vertex and the number of edges present always equals the number of vertices. So, the polygons considered are not necessarily monotone in nature, they may contain inner walls and potentially even obstructions within them commonly termed ‘holes’ in the literature. Originally, Victor Klee had posed the problem this problem as an open question.
+				The polygons usually considered part of this problem are all termed ‘simple’. Simple polygons possess the following properties: they enclose a region with a definite, measurable area, their edges meet only at the ends, no more than two edges meet at a vertex and the number of edges present always equals the number of vertices. So, the polygons considered are not necessarily monotone in nature, they may contain inner walls and potentially even obstructions within them commonly termed ‘holes’ in the literature. Originally, Victor Klee had posed the problem this problem as an open question.
 				Visibility from a point is defined as the area inside the art gallery visible from that point i.e., we can draw a straight line from the point to any other point in that area without crossing the boundaries of polygon.
 
-				There are some variation of this problem based on guard placement and movement:
-				Vertex Guards: Guards are placed only at vertices of polygon.
-				Edge Guards: Guards can move along the edges of polygon.
+				There are some variations of this problem based on guard placement and type of  movement allowed:
+				Vertex Guards: Guards are placed only at the vertices of the polygon.
+				Edge Guards: Guards can move along the edges of the polygon.
 				Point Guards: Guards can be placed anywhere in the polygon.
 				Stationary Guards: Guards remain in the same position.
-				Mobile Guards: Guards can move along a path inside polygon (usually restricted to diagonals or edges).
+				Mobile Guards: Guards can move along a path inside the polygon (usually restricted to diagonals or edges).
 				Hidden Guards: No two guards are visible to each other.
 				Guarded Guards: Every guard is visible to at least one other guard.
 
@@ -482,18 +482,19 @@
 		<section>
 			<H3 align="center">Approach 2: Augmenting using Reflex Vertices</H3>
 			<p align="justify">
-				In an any convex polygon it is evident that one guard will be enough to guard it, as all points within the polygon are visible from all other points within polygon. If there is only one reflex vertex, all points are still visible from the reflex vertex. This led us to believe, type of vertex have pivotal role in deciding minimum guard points. O’rourke has proved that placing guard at all reflex vertices is sufficient to cover art gallery, but it's not always guaranteed to give better solution than existing n/3 lower bound. Justin Iwerks et al. have summarized lower bound for guards in terms of reflex and convex vertices.
+				In any convex polygon, it is evident that one guard will be enough to guard it, as all points within the polygon are visible from all other points within it. If there is only one reflex vertex, all the points are still visible from the reflex vertex. This led us to believe, that the type of vertex has a pivotal role in deciding minimum guard points. O’Rourke has proved that placing guard at all reflex vertices is sufficient to cover a given art gallery polygon, but it is not always guaranteed to give a better solution than the existing n/3 lower bound. Justin Iwerks et al. have summarized lower bound for guards in terms of reflex and convex vertices.
 			</p>
 			<p align="center">
 				<img src="images/ReflexVertices1.PNG" alt="Reflex Vertex Examples">
 			</p>
+			<br>
 			<p>
-				Guards at reflex vertices, better than existing ⌊n/3⌋ lower bound if  r ≤ ⌊c/2⌋
+				Guards at reflex vertices, better than existing ⌊n/3⌋ lower bound if  r ≤ ⌊c/2⌋ <br>
 				r = reflex vertices, c = convex vertices, r + c = n <br>
-				Number of sufficient guards 	= 1		If r = 0 <br>
-												= r		If r ≤ ⌊c/2⌋ <br>
-												= ⌊n/3⌋ 	If ⌊c/2⌋ <  r  < 5c−12 <br>
-												= 2c-4 		If r  ≥  5c-12 <br>
+				Number of sufficient guards = 1	   &emsp;&emsp;&nbsp; If r = 0 <br>
+				&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;= r	   &emsp;&emsp;&nbsp;&nbsp;&nbsp;If r ≤ ⌊c/2⌋ <br>
+				&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;= ⌊n/3⌋ &nbsp;&nbsp;&nbsp;  If ⌊c/2⌋ <  r  < 5c−12 <br>
+				&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;= 2c-4 	&emsp; If r  ≥  5c-12 <br>
 			</p>
 			<p align="justify">
 				These lower bound conditions can be used to determine if three coloring method is giving better solution. reflex vertices in a polygon can be identified in O(n) time, using determinant method.  
