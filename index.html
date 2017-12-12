@@ -297,7 +297,7 @@
 		<section>
 			<H2 align="center">Background</H2>
 			<p align="justify">
-				The polygons usually considered part of this problem are all termed ‘simple’. Simple polygons possess the following properties: they enclose a region with a definite, measurable area, their edges meet only at the ends, no more than two edges meet at a vertex and the number of edges present always equals the number of vertices. So, the polygons considered are not necessarily monotone in nature, they may contain inner walls and potentially even obstructions within them commonly termed ‘holes’ in the literature. Originally, Victor Klee had posed this as an open question <i>[1]</i>.
+				The polygons usually considered part of this problem are all termed ‘simple’. Simple polygons possess the following properties: they enclose a region with a definite, measurable area, their edges meet only at the ends, no more than two edges meet at a vertex and the number of edges present always equals the number of vertices. So, the polygons considered are not necessarily monotone in nature, they may contain inner walls and potentially even obstructions within them commonly termed ‘holes’ in the literature. Originally, Victor Klee had posed this as an open question <a href="#references"><i>[1]</i></a>.
 				Visibility from a point is defined as the area inside the art gallery visible from that point i.e., we can draw a straight line from the point to any other point in that area without crossing the boundaries of polygon.
 			</p>
 			<p align="justify">
@@ -319,7 +319,7 @@
 				<b>Orthogonal polygon:</b> A polygon whose edges are all aligned with pair of orthogonal coordinate axes which could possibly be vertical and horizontal. All internal angles are thus 90 degrees or 270 degrees.
 			</p>
 			<p align="justify">
-				Victor Klee’s question pertained to stationary guards <i>[1]</i>. Chvatal answered by proving that a simple polygon needed at most n/3 guards<i>[1]</i>. Fisk then provided a proof for Chvatal’s result using triangulation and colouring<i>[1]</i>. Avis and Toussaint came up with an algorithm for positioning guards in O(n log n) time<i>[1]</i>. O’Rourke then proved that a simple polygon needed at most n/4 mobile guards<i>[1]</i>. Rourke also went on to prove that simple polygons with holes required at most n+2h/3 vertex guards<i>[1]</i>. Kahn proved that n/4 guards were sufficient for orthogonal polygons<i>[1]</i>. This was done through convex quadrilateralization followed by colouring. Aggarwal then showed that (3n+4)/16 mobile guards sufficed for orthogonal polygons<i>[1]</i>. It has been repeatedly proven that the art gallery problem is an NP hard problem by reducing it to the well known set cover problem.
+				Victor Klee’s question pertained to stationary guards <a href="#references"><i>[1]</i></a>. Chvatal answered by proving that a simple polygon needed at most n/3 guards <a href="#references"><i>[1]</i></a>. Fisk then provided a proof for Chvatal’s result using triangulation and colouring <a href="#references"><i>[1]</i></a>. Avis and Toussaint came up with an algorithm for positioning guards in O(n log n) time <a href="#references"><i>[1]</i></a>. O’Rourke then proved that a simple polygon needed at most n/4 mobile guards <a href="#references"><i>[1]</i></a>. Rourke also went on to prove that simple polygons with holes required at most n+2h/3 vertex guards<i>[1]</i>. Kahn proved that n/4 guards were sufficient for orthogonal polygons <a href="#references"><i>[1]</i></a>. This was done through convex quadrilateralization followed by colouring. Aggarwal then showed that (3n+4)/16 mobile guards sufficed for orthogonal polygons <a href="#references"><i>[1]</i></a>. It has been repeatedly proven that the art gallery problem is an NP hard problem by reducing it to the well known set cover problem.
 			</p>
 		</section>
 		<br>
@@ -358,17 +358,17 @@
 			  </tr>
 			  <tr>
 			    <td align="center">General</td>
-			    <td align="center">n/3 (<i>Chvatal</i>)[1]</td> 
-			    <td align="center">n/4 (<i>O'Rourke</i>)[1]</td>
+			    <td align="center">n/3 (<i>Chvatal</i>)<a href="#references"><i>[1]</i></a></td> 
+			    <td align="center">n/4 (<i>O'Rourke</i>)<a href="#references"><i>[1]</i></a></td>
 			  </tr>
 			  <tr>
 			    <td align="center">Orthogonal</td>
-			    <td align="center">n/4 (<i>Kahn</i>)[1]</td> 
-			    <td align="center">(3n+4)/16 (<i>Aggarwal</i>)[5]</td>
+			    <td align="center">n/4 (<i>Kahn</i>)<a href="#references"><i>[1]</i></a></td> 
+			    <td align="center">(3n+4)/16 (<i>Aggarwal</i>)<a href="#references"><i>[5]</i></a></td>
 			  </tr>
 			</table>
 			<p align="justify">
-				For a simple polygon with n vertices and h holes, the upper bound is known to be (n+2h)/3 (<i>Hoffmann, Kaufmann, Kriegel 1991</i> [5]). And in general, the number of mobile guards required to cover a given gallery is only 75% of the number of stationary guards required.
+				For a simple polygon with n vertices and h holes, the upper bound is known to be (n+2h)/3 (<i>Hoffmann, Kaufmann, Kriegel 1991</i> <a href="#references"><i>[5]</i></a>). And in general, the number of mobile guards required to cover a given gallery is only 75% of the number of stationary guards required.
 
 				Other than these, Chazelle came up with an O(n<sup>3</sup>) dynamic algorithm for convex partitioning, using which art gallery problem can be reduced to set cover problem (known to be NP-Hard), but approximation algorithms exist.  Ghosh (2010) gave an O(n<sup>4</sup>) time approximation algorithm for the minimum vertex guard problem. There are some algorithms which use linear integer programming for approximation.
 			</p>
@@ -612,7 +612,7 @@
 			</p>
 			<br>
 			<p align="justify">
-				We also attempted to calculate and display the overlap between two visibility polygons. Unfortunately, the library we used to calculate the polygonal intersection turned out to be too slow for our interactive application. It would also slow down drastically if the overlapping area was too large. We were forced to test it only for cases where the overlaps were miniscule. The colour scheme for the results is similar to the above figures but with the added presence of a darker yellow portion outlined in white which represents the intersection polygon of the two guards’ visibility polygons. A few of our results are shown below:
+				We also attempted to calculate and display the overlap between two visibility polygons. Unfortunately, the library we used to calculate the polygonal intersection turned out to be too slow for our interactive application <a href="#references"><i>[12]</i></a>. It would also slow down drastically if the overlapping area was too large. We were forced to test it only for cases where the overlaps were miniscule. The colour scheme for the results is similar to the above figures but with the added presence of a darker yellow portion outlined in white which represents the intersection polygon of the two guards’ visibility polygons. A few of our results are shown below:
 			</p>
 			<br>
 			<p align="center">1) The figure below shows two guards inside a polygon that also contains an obstacle (in red). The two visibility polygons share a small corner of overlap.</p>
@@ -657,23 +657,23 @@
 		<section>
 			<H2 align="center">Challenges</H2>
 			<p align="justify">
-				The biggest challenge we faced throughout the project was the sheer amount of material available on the space. Since it is a well studied problem in computational geometry, several people have tried their hand at it. The literature is not always clear regarding which variant of the problem is being written about. Although we decided to concentrate on vertex guards for our approach, there were several papers with suggestions for edge guards, point guards and other variants. And wading through all this material was time consuming to say the least. Also, several papers tried to solve the same problems in very similar ways but with tiny tweaks built in. Since not all the papers talk in explicit terms about the algorithms they used - they tend to mention the approach in more roundabout ways - it took us a while to understand what these subtle differences were and internalize them. We also took a while to understand why different approaches might be required for polygons of different shapes. Initially we were trying to tackle all kinds of polygons with the same generic method. There are also results in the literature that have been derived using relationships between different variants of the art gallery problem. It took us a while to gather several of these and go through them to understand these connections and the conclusions arrived at because of them. Furthermore, several optimal proofs in the literature tend to be quite mathematically dense and convoluted. A stand out in this regard is the Chazelle paper that proves that polygon triangulation can actually be done in linear time. The approach described has been deemed impractical for real world applications because of the sheer amount of work required to achieve the result. Similarly, several of the papers that described the best run times turned out to be beyond our reach. Another constant challenge was dealing with precision in our approaches. We constantly had problem with zero division while finding slopes or determinants. We used epsilon to offset the error in most cases. But as discussed before, it does not necessarily give the best results always. We had to sacrifice some accuracy in order to get functional demos. Finally, as mentioned earlier, we found it hard to gather input polygons for our testing and even when we did find some, they were in different formats that would require pre-processing to be done in order to make them compatible with our code.
+				The biggest challenge we faced throughout the project was the sheer amount of material available on the space. Since it is a well studied problem in computational geometry, several people have tried their hand at it. The literature is not always clear regarding which variant of the problem is being written about. Although we decided to concentrate on vertex guards for our approach, there were several papers with suggestions for edge guards, point guards and other variants. And wading through all this material was time consuming to say the least. Also, several papers tried to solve the same problems in very similar ways but with tiny tweaks built in. Since not all the papers talk in explicit terms about the algorithms they used - they tend to mention the approach in more roundabout ways - it took us a while to understand what these subtle differences were and internalize them. We also took a while to understand why different approaches might be required for polygons of different shapes. Initially we were trying to tackle all kinds of polygons with the same generic method. There are also results in the literature that have been derived using relationships between different variants of the art gallery problem. It took us a while to gather several of these and go through them to understand these connections and the conclusions arrived at because of them. Furthermore, several optimal proofs in the literature tend to be quite mathematically dense and convoluted. A stand out in this regard is the Chazelle paper that proves that polygon triangulation can actually be done in linear time <a href="#references"><i>[18]</i></a>. The approach described has been deemed impractical for real world applications because of the sheer amount of work required to achieve the result. Similarly, several of the papers that described the best run times turned out to be beyond our reach. Another constant challenge was dealing with precision in our approaches. We constantly had problem with zero division while finding slopes or determinants. We used epsilon to offset the error in most cases. But as discussed before, it does not necessarily give the best results always. We had to sacrifice some accuracy in order to get functional demos. Finally, as mentioned earlier, we found it hard to gather input polygons for our testing and even when we did find some, they were in different formats that would require pre-processing to be done in order to make them compatible with our code.
 			</p>
 		</section>
 		<br>
 		<section>
 			<H2 align="center">Lessons Learned</H2>
 			<p align="justify">
-				Knowing what we know today, we would definitely have considered spending more time on the integer linear programming approaches we came across. We did go through the material and attempt to get a demo working but would have required much more time to achieve satisfactory results. 
+				Knowing what we know today, we would definitely have considered spending more time on the integer linear programming approaches we came across <a href="#references"><i>[19]</i></a>. We did go through the material and attempt to get a demo working but would have required much more time to achieve satisfactory results. 
 			</p>
 			<p align="justify">
 				We would also try to look for ways to implement optimal polygon intersection algorithms that could viably work on top of our visibility implementation. We did not have time to implement our own so we ended up experimenting with third party libraries instead, which proved to suffer from their own issues as well as added significant computational cost to an already unideal method overall.
 			</p>
 			<p align="justify">
-				Close to the end of our project, we discovered papers that took different approaches to finding the visibility for a point, some even mention approximate methods that lead to satisfactory results. Common methods mentioned were genetic algorithms and simulated annealing. We believe these methods could give interesting results that are worth looking into.
+				Close to the end of our project, we discovered papers that took different approaches to finding the visibility for a point, some even mention approximate methods that lead to satisfactory results. Common methods mentioned were genetic algorithms and simulated annealing <a href="#references"><i>[19]</i></a>. We believe these methods could give interesting results that are worth looking into.
 			</p>
 			<p align="justify">
-				We learned that investing in creating a random polygon generator early on during the project would have helped in rapid testing of our algorithms on different shapes. We thought we could find a library to do this readily but later failed to do so. This is something that would have greatly enhanced our speed and ability to run tests and generate results quickly.
+				We learned that investing in creating a random polygon generator early on during the project would have helped in rapid testing of our algorithms on different shapes (<a href="#references"><i>[22]</i></a>, <a href="#references"><i>[23]</i></a> and <a href="#references"><i>[26]</i></a>). We thought we could find a library to do this readily but later failed to do so. This is something that would have greatly enhanced our speed and ability to run tests and generate results quickly.
 			</p>
 			<p align="justify">
 				And finally, reducing our scope as much as possible early on might have helped. That would have led to us reading papers to do with the variants to the problem. The other side of the coin would be that we would not have found some of the important papers we stumbled upon later since it was our constant searching that unearthed papers that explained things in simpler terms as well as exposed us to different approaches.
@@ -692,7 +692,7 @@
 				A lot of the more modern methods to tackle the problem in an efficient manner seem to prefer approaching it as more of an optimization problem rather than one to do with geometry. They reduce it to a set cover space and then apply linear integer programming to solve it incrementally. Although we glanced at these methods, we did not attempt them as we chose the visibility approach instead.
 			</p>
 			<p align="justify">
-				For the visibility problem, several methods use approximation techniques with local search variations like simulated annealing and steepest ascent to arrive at the maximum possible visibility polygon in an area within a polygon. Other popular approaches that can be attempted include more sophisticated space partitioning data structures like BSPs to make the visibility computation faster and cheaper.
+				For the visibility problem, several methods use approximation techniques with local search variations like simulated annealing and steepest ascent to arrive at the maximum possible visibility polygon in an area within a polygon <a href="#references"><i>[21]</i></a>. Other popular approaches that can be attempted include more sophisticated space partitioning data structures like BSPs to make the visibility computation faster and cheaper.
 			</p>
 			<p align="justify">
 				Our solution for visibility, can very easily be used as a viable component to solve the popular moving guards variant of the art gallery problem. The guards can be animated for a gallery, each movement will generate a new polygon whose overlap with others could be computed. And patrol paths can be arrived at for each guard so as to ensure every point in the gallery remains guarded at every point during the simulation. A machine learning algorithm to optimize for such a situation could be an interesting task. Reinforcement learning to arrive at the best paths seems like a good option. After several runs, the optimal path could be displayed.
@@ -706,6 +706,7 @@
 		</section>
 		<br>
 		<section>
+			<a name="references">
 			<H2 align="center">References</H2>
 			<ol>
 				<li>
