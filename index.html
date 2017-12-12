@@ -393,8 +393,8 @@
 				<br>
 				<br>
 				Algorithm for <font face="consolas">monotonize(P):<br><br>
-				<b>Input</b>. A simple polygon P stored as a list of vertices D.<br>
-				<b>Output</b>. A partitioning of P into monotone sub-polygons, stored in another list E. <br>
+				<b>Input</b>: A simple polygon P stored as a list of vertices D.<br>
+				<b>Output</b>: A partitioning of P into monotone sub-polygons, stored in another list E. <br>
 				&emsp; 1. Construct a priority queue-like structure Q using the vertices of P, using their y-coordinates as priority. If two points have the same y-coordinate, then select the one with the smaller x-coordinate to have higher priority. <br>
 				&emsp; 2. Initialize an empty binary search tree T. <br>
 				&emsp; 3. While Q is not empty. <br>
@@ -413,25 +413,25 @@
 				&emsp; &emsp; 2. Once found, add a diagonal between the two vertices.<br>
 
 				&emsp; Else if it is a merge vertex,<br>
-				&emsp; &emsp; 1.  Remember the merge vertex. Add it to a stack so that it can be popped out when it gets connected to another vertex using a diagonal.<br>
+				&emsp; &emsp; 1.  Remember the merge vertex. Add it to a stack so that it can be popped out when it eventually gets connected to another vertex later on using a diagonal.<br>
 
 				&emsp; Else (it is a regular vertex),<br>
-				&emsp; &emsp; 1. Add it to the T in the required position.<br>
+				&emsp; &emsp; 1. Add it to T in the required position.<br>
 				</font>
 				<br>
 				<br>
 
 				Algorithm for <font face="consolas">triangulateMonotonePolygons(P):<br><br>
-				<b>Input</b>. A y-monotone polygon P stored in a list D. <br>
-				<b>Output</b>. A triangulation of P stored in a list D. <br>
+				<b>Input</b>: A y-monotone polygon P stored in a list D. <br>
+				<b>Output</b>: A triangulation of P stored in a list E. <br>
 				&emsp; 1. Iterate across the polygons from left to right.<br>
 				&emsp; 2. Initialize a stack , and continuously push vertices into it based on whether they are in the upper or lower chain.<br>
 				&emsp; 3. On each iteration: <br>
-				&emsp; 4. If vertex 1 and vertex 2 are on different chains <br>
+				&emsp; 4. If vertex 1 and vertex 2 are on different chains, <br>
 				&emsp; 5. Then Pop all the  vertices from S. <br>
 				&emsp; 6. And then Insert a diagonal from the vertex to each popped vertex, other than the last vertex,<br>
 				&emsp; 7. Else Pop one vertex from S. <br>
-				&emsp; 8. Pop the other vertices from S as long as the diagonals lie inside P. Insert these diagonals into D. Push the last vertex that has been popped back onto S.<br>
+				&emsp; 8. Pop the other vertices from S as long as the diagonals lie inside P. Insert these diagonals into D. Push the last vertex that has been popped back onto S. This will complete the process for that polygon.<br>
 				</font>
 			</p>
 			<br>
@@ -518,6 +518,23 @@
 			</p>
 			<p align="justify">
 				Instead of just sticking with this approach, we decided to augment it further by storing the object in a balanced tree structure based on angle with respect to the point, and then by distance, so that looking them up would be a constant time operation for any point. Building up the tree takes O(n) time for each guard location being checked. If the guard is dragged around in the interactive application we made, each drag coordinate will regenerate the tree. This could help augment our previous implementation by potentially acting as an index - if that guard location is checked again, we can just use the previously generated treat to create the visibility polygon quickly. 
+			</p>
+			<p align="justify">
+				Some pseudocode which will give more clarity about our approach:
+				<br>
+				<br>
+				Algorithm for <font face="consolas">vertexRayCast(point, Scene):<br><br>
+				<b>Inputs</b>: A point which signifies the position of the guard and the entire Scene in the form of a list of polygons. <br>
+				<b>Output</b>: A visibility polygon. <br>
+				VP = {}<br>
+				for each polygon P in the Scene:<br>
+				&emsp;for each vertex V of P:<br>
+				&emsp;&emsp;d = The distance of V from point.<br>
+				&emsp;&emsp;a = angle of V wrt point.<br>
+				&emsp;&emsp;for each other polygon P2 in the Scene:<br>
+				&emsp;&emsp;&emsp;d = minimum(d, The distance of P2 from point).<br>
+				&emsp;&emsp;Add Vertex with angle a and distance d to VP.<br>
+				return VP.</font>
 			</p>
 			<p align="justify">
 				Figures showing our results are below:<br><br>
