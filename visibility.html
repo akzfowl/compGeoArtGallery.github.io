@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Visibility Polygon</title>
+		<script src="dat.gui.min.js"></script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body onload="init();">
+		<div align="center">
+  			<canvas id="canvas" width="1500" height="900"></canvas>
+  		</div>
+  		<script src="solution.js"></script>
+  		<script>
+  			var width = 1500;
+			var height = 900;
+			var dragIndex;
+			var dragging;
+			var numGuards = 2;
+			var observerX = [];
+			var observerY = [];
+
+			for(var i=0;i<numGuards;i++){
+				observerX.push(randomIntFromInterval(10, width-30));
+				observerY.push(randomIntFromInterval(10, height-30));
+			}
+
+			/*var observer_x = 20;
+			var observer_y = 30;
+			var observer_x2 = 100;
+			var observer_y2 = 100;*/
+
+			var canvas = document.getElementById('canvas');
+
+			function randomIntFromInterval(min,max)
+			{
+    			return Math.floor(Math.random()*(max-min+1)+min);
+			}
+
+			compute = function(position, segments) {
+				var polygon = [];
+			  
+				var sorted = sortPoints(position, segments);
+			  
+				var map = new Array(segments.length);
+				for (var i = 0; i < map.length; ++i) map[i] = -1;
+				var heap = [];
+				var start = [position[0] + 1, position[1]];
+				for (var i = 0; i < segments.length; ++i) {
+					var a1 = angle(segments[i][0], position);
+					var a2 = angle(segments[i][1], position);
+					var active = false;
+					if (a1 > -180 && a1 <= 0 && a2 <= 180 && a2 >= 0 && a2 - a1 > 180) active = true;
+					if (a2 > -180 && a2 <= 0 && a1 <= 180 && a1 >= 0 && a1 - a2 > 180) active = true;
+					if (active) {
+						insert(i, heap, position, segments, start, map);
+					}
+				}
+			  
+				for (var i = 0; i < sorted.length;) {
+					var extend = false;
+					var shorten = false;
+					var orig = i;
+					var vertex = segments[sorted[i][0]][sorted[i][1]];
+					var old_segment = heap[0];
+					do {
+						if (map[sorted[i][0]] != -1) {
+							if (sorted[i][0] == old_segment) {
+								extend = true;
+								vertex = segments[sorted[i][0]][sorted[i][1]];
+							}
+							remove(map[sorted[i][0]], heap, position, segments, vertex, map);
+						} else {
+							insert(sorted[i][0], heap, position, segments, vertex, map);
+							if (heap[0] != old_segment) {
+								shorten = true;
+							}
+						}
+						++i;
+						if (i == sorted.length) break;
+					} while (sorted[i][2] < sorted[orig][2] + epsilon());
+
+					if (extend) {
+						polygon.push(vertex);
+						var cur = intersectLines(segments[heap[0]][0], segments[heap[0]][1], position, vertex);
+						if (!equal(cur, vertex)){
+			        	polygon.push(cur);
+			      		} 
+					} else if (shorten) {
+			      
+						polygon.push(intersectLines(segments[old_segment][0], segments[old_segment][1], position, vertex));
+			      
+						polygon.push(intersectLines(segments[heap[0]][0], segments[heap[0]][1], position, vertex));
+					} 
+				}
+			  
+				return polygon;
+			};
+
+			convertToSegments = function(polygons) {
+				var segments = [];
+				for (var i = 0; i < polygons.length; ++i) {
+					for (var j = 0; j < polygons[i].length; ++j) {
+						var k = j+1;
+						if (k == polygons[i].length) k = 0;
+						segments.push([polygons[i][j], polygons[i][k]]);
+					}
+				}
+				return segments;
+			};
+
+			breakIntersections = function(segments) {
+				var output = [];
+				for (var i = 0; i < segments.length; ++i) {
+					var intersections = [];
+					for (var j = 0; j < segments.length; ++j) {
+						if (i == j) continue;
+						if (doLineSegmentsIntersect(segments[i][0][0], segments[i][0][1], segments[i][1][0], segments[i][1][1], segments[j][0][0], segments[j][0][1], segments[j][1][0], segments[j][1][1])) {
+							var intersect = intersectLines(segments[i][0], segments[i][1], segments[j][0], segments[j][1]);
+							if (intersect.length != 2) continue;
+							if (equal(intersect, segments[i][0]) || equal(intersect, segments[i][1])) continue;
+							intersections.push(intersect);
+						}
+					}
+					var start = segments[i][0];
+					while (intersections.length > 0) {
+						var endIndex = 0;
+						var endDis = distance(start, intersections[0]);
+						for (var j = 1; j < intersections.length; ++j) {
+							var dis = distance(start, intersections[j]);
+							if (dis < endDis) {
+								endDis = dis;
+								endIndex = j;
+							}
+						}
+						output.push([[start[0], start[1]], [intersections[endIndex][0], intersections[endIndex][1]]]);
+						start[0] = intersections[endIndex][0];
+						start[1] = intersections[endIndex][1];
+						intersections.splice(endIndex, 1);
+					}
+					output.push([start, segments[i][1]]);
+				}
+				return output;
+			};
+
+			epsilon = function() {
+				return 0.0000001;
+			};
+
+			equal = function(a, b) {
+				if (Math.abs(a[0] - b[0]) < epsilon() && Math.abs(a[1] - b[1]) < epsilon()) return true;
+				return false;
+			};
+
+			remove = function(index, heap, position, segments, destination, map) {
+				map[heap[index]] = -1;
+				if (index == heap.length - 1) {
+					heap.pop();
+					return;
+				}
+				heap[index] = heap.pop();
+				map[heap[index]] = index;
+				var cur = index;
+				var parent = findParent(cur);
+				if (cur != 0 && lessThan(heap[cur], heap[parent], position, segments, destination)) {
+					while (cur > 0) {
+						var parent = findParent(cur);
+						if (!lessThan(heap[cur], heap[parent], position, segments, destination)) {
+							break;
+						}
+						map[heap[parent]] = cur;
+						map[heap[cur]] = parent;
+						var temp = heap[cur];
+						heap[cur] = heap[parent];
+						heap[parent] = temp;
+						cur = parent;
+					}
+				} else {
+					while (true) {
+						var left = child(cur);
+						var right = left + 1;
+						if (left < heap.length && lessThan(heap[left], heap[cur], position, segments, destination) &&
+								(right == heap.length || lessThan(heap[left], heap[right], position, segments, destination))) {
+							map[heap[left]] = cur;
+							map[heap[cur]] = left;
+							var temp = heap[left];
+							heap[left] = heap[cur];
+							heap[cur] = temp;
+							cur = left;
+						} else if (right < heap.length && lessThan(heap[right], heap[cur], position, segments, destination)) {
+							map[heap[right]] = cur;
+							map[heap[cur]] = right;
+							var temp = heap[right];
+							heap[right] = heap[cur];
+							heap[cur] = temp;
+							cur = right;
+						} else break;
+					}
+				}
+			};
+
+			insert = function(index, heap, position, segments, destination, map) {
+				var intersect = intersectLines(segments[index][0], segments[index][1], position, destination);
+				if (intersect.length == 0) return;
+				var cur = heap.length;
+				heap.push(index);
+				map[index] = cur;
+				while (cur > 0) {
+					var parent = findParent(cur);
+					if (!lessThan(heap[cur], heap[parent], position, segments, destination)) {
+						break;
+					}
+					map[heap[parent]] = cur;
+					map[heap[cur]] = parent;
+					var temp = heap[cur];
+					heap[cur] = heap[parent];
+					heap[parent] = temp;
+					cur = parent;
+				}
+			};
+
+			lessThan = function(index1, index2, position, segments, destination) {
+				var inter1 = intersectLines(segments[index1][0], segments[index1][1], position, destination);
+				var inter2 = intersectLines(segments[index2][0], segments[index2][1], position, destination);
+				if (!equal(inter1, inter2)) {
+					var d1 = distance(inter1, position);
+					var d2 = distance(inter2, position);
+					return d1 < d2;
+				}
+				var end1 = 0;
+				if (equal(inter1, segments[index1][0])) end1 = 1;
+				var end2 = 0;
+				if (equal(inter2, segments[index2][0])) end2 = 1;
+				var a1 = angle2(segments[index1][end1], inter1, position);
+				var a2 = angle2(segments[index2][end2], inter2, position);
+				if (a1 < 180) {
+					if (a2 > 180) return true;
+					return a2 < a1;
+				}
+				return a1 < a2;
+			};
+
+			findParent = function(index) {
+				return Math.floor((index-1)/2);
+			};
+
+			child = function(index) {
+				return 2*index+1;
+			};
+
+			angle2 = function(a, b, c) {
+				var a1 = angle(a,b);
+				var a2 = angle(b,c);
+				var a3 = a1 - a2;
+				if (a3 < 0) a3 += 360;
+				if (a3 > 360) a3 -= 360;
+				return a3;
+			};
+
+			sortPoints = function(position, segments) {
+				var points = new Array(segments.length * 2);
+				for (var i = 0; i < segments.length; ++i) {
+					for (var j = 0; j < 2; ++j) {
+						var a = angle(segments[i][j], position);
+						points[2*i+j] = [i, j, a];
+					}
+				}
+			  
+				points.sort(function(a,b) {return a[2]-b[2];});
+			  
+				return points;
+			};
+
+			angle = function(a, b) {
+				return Math.atan2(b[1]-a[1], b[0]-a[0]) * 180 / Math.PI;
+			};
+
+			intersectLines = function(a1, a2, b1, b2) {
+				var ua_t = (b2[0] - b1[0]) * (a1[1] - b1[1]) - (b2[1] - b1[1]) * (a1[0] - b1[0]);
+				var ub_t = (a2[0] - a1[0]) * (a1[1] - b1[1]) - (a2[1] - a1[1]) * (a1[0] - b1[0]);
+				var u_b  = (b2[1] - b1[1]) * (a2[0] - a1[0]) - (b2[0] - b1[0]) * (a2[1] - a1[1]);
+				if (u_b != 0) {
+					var ua = ua_t / u_b;
+					var ub = ub_t / u_b;
+					return [a1[0] - ua * (a1[0] - a2[0]), a1[1] - ua * (a1[1] - a2[1])];
+				}
+				return [];
+			};
+
+			distance = function(a, b) {
+				return (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]);
+			};
+
+			isOnSegment = function(xi, yi, xj, yj, xk, yk) {
+			  return (xi <= xk || xj <= xk) && (xk <= xi || xk <= xj) &&
+			         (yi <= yk || yj <= yk) && (yk <= yi || yk <= yj);
+			};
+
+			computeDirection = function(xi, yi, xj, yj, xk, yk) {
+			  a = (xk - xi) * (yj - yi);
+			  b = (xj - xi) * (yk - yi);
+			  return a < b ? -1 : a > b ? 1 : 0;
+			};
+
+			doLineSegmentsIntersect = function(x1, y1, x2, y2, x3, y3, x4, y4) {
+			  d1 = computeDirection(x3, y3, x4, y4, x1, y1);
+			  d2 = computeDirection(x3, y3, x4, y4, x2, y2);
+			  d3 = computeDirection(x1, y1, x2, y2, x3, y3);
+			  d4 = computeDirection(x1, y1, x2, y2, x4, y4);
+			  return (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+			          ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) ||
+			         (d1 == 0 && isOnSegment(x3, y3, x4, y4, x1, y1)) ||
+			         (d2 == 0 && isOnSegment(x3, y3, x4, y4, x2, y2)) ||
+			         (d3 == 0 && isOnSegment(x1, y1, x2, y2, x3, y3)) ||
+			         (d4 == 0 && isOnSegment(x1, y1, x2, y2, x4, y4));
+			};
+
+
+			/*Frank added this here*/
+
+			window.requestAnimFrame = (function() {
+				return  window.requestAnimationFrame       || 
+					window.webkitRequestAnimationFrame || 
+					window.mozRequestAnimationFrame    || 
+					window.oRequestAnimationFrame      || 
+					window.msRequestAnimationFrame     || 
+					function(/* function */ callback, /* DOMElement */ element){
+						window.setTimeout(callback, 1000 / 60);
+					};
+			})();
+
+			function onDocumentMouseClick(event){
+			  //console.log("NewX:" + event.clientX);
+			  //console.log("NewY:" + event.clientY);
+			  
+			  var rect = canvas.getBoundingClientRect();
+			  
+			  observer_x = event.clientX - rect.left;
+			  observer_y = event.clientY - rect.top;
+			  init();
+			}
+
+			function hitTest(x, y, mx, my) {
+		
+				var dx;
+				var dy;
+				dx = mx - x;
+				dy = my - y;
+				
+				//a "hit" will be registered if the distance away from the center is less than the radius of the circular object		
+				return (dx*dx + dy*dy < 20);
+			}
+
+			function mouseDownListener(evt){
+				//console.log("X:" + evt.clientX);
+				//console.log("Y:" + evt.clientY);
+
+				var i;
+				//We are going to pay attention to the layering order of the objects so that if a mouse down occurs over more than object,
+				//only the topmost one will be dragged.
+				var highestIndex = -1;
+				
+				//getting mouse position correctly, being mindful of resizing that may have occured in the browser:
+				var bRect = canvas.getBoundingClientRect();
+				mouseX = (evt.clientX - bRect.left);
+				mouseY = (evt.clientY - bRect.top);
+						
+				//find which shape was clicked
+				for (i=0; i < numGuards; i++) {
+					if	(hitTest(observerX[i], observerY[i], mouseX, mouseY)) {
+						dragging = true;
+						if (i > highestIndex) {
+							//We will pay attention to the point on the object where the mouse is "holding" the object:
+							dragIndex = i;
+							dragHoldX = mouseX - observerX[i];
+							dragHoldY = mouseY - observerY[i];
+							highestIndex = i;
+							dragIndex = i;
+						}
+					}
+					/*else if(hitTest(observer_x2, observer_y2, mouseX, mouseY)){
+						dragging = true;
+						dragIndex = 2;
+						dragHoldX = mouseX - observer_x2;
+						dragHoldY = mouseY - observer_y2;
+					}*/
+				}
+				
+				if (dragging) {
+					window.addEventListener("mousemove", mouseMoveListener, false);
+				}
+				canvas.removeEventListener("mousedown", mouseDownListener, false);
+				window.addEventListener("mouseup", mouseUpListener, false);
+				
+				//code below prevents the mouse down from having an effect on the main browser window:
+				if (evt.preventDefault) {
+					evt.preventDefault();
+				} //standard
+				else if (evt.returnValue) {
+					evt.returnValue = false;
+				} //older IE
+				return false;
+			}
+
+			function mouseUpListener(evt) {
+				canvas.addEventListener("mousedown", mouseDownListener, false);
+				window.removeEventListener("mouseup", mouseUpListener, false);
+				if (dragging) {
+					dragging = false;
+					window.removeEventListener("mousemove", mouseMoveListener, false);
+				}
+				//console.log("Observer X:" + observer_x);
+				//console.log("Observer Y:" + observer_y);
+			}
+
+	function convertPolygonsAndComputeIntersection(poly1, poly2){
+		console.log("Polygon 1: " + poly1);
+		console.log("Polygon 2: " + poly2);
+
+		var polygon1 = [];
+		var polygon2 = [];
+
+		
+		for(var i=0;i<poly1.length;i++){
+			var vertex1 = new Object();
+			vertex1.x = poly1[i][0];
+			vertex1.y = poly1[i][1];
+			polygon1.push(vertex1);
+		}
+
+		for(var i=0;i<poly2.length;i++){
+			var vertex2 = new Object();
+			vertex2.x = poly2[i][0];
+			vertex2.y = poly2[i][1];
+			polygon2.push(vertex2);
+		}
+
+		console.log("Converted Polygon 1: " + polygon1);
+		console.log("Converted Polygon 2: " + polygon2);
+
+		//return intersect(polygon1, polygon2);
+		//return polygonsIntersect(polygon1, polygon2);
+	}
+
+	function mouseMoveListener(evt) {
+		var posX;
+		var posY;
+		var shapeRad = 8;
+		var minX = shapeRad;
+		var maxX = canvas.width - shapeRad;
+		var minY = shapeRad;
+		var maxY = canvas.height - shapeRad;
+		//getting mouse position correctly 
+		var bRect = canvas.getBoundingClientRect();
+		mouseX = (evt.clientX - bRect.left)*(canvas.width/bRect.width);
+		mouseY = (evt.clientY - bRect.top)*(canvas.height/bRect.height);
+		
+		//clamp x and y positions to prevent object from dragging outside of canvas
+		posX = mouseX - dragHoldX;
+		posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
+		posY = mouseY - dragHoldY;
+		posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
+		
+
+		observerX[dragIndex] = posX;
+		observerY[dragIndex] = posY;
+		/*if(dragIndex == 1){
+			observer_x = posX;
+			observer_y = posY;	
+		}
+		else if(dragIndex == 2){
+			observer_x2 = posX;
+			observer_y2 = posY;		
+		}*/
+		
+		init();
+	}
+
+			
+
+			function init() {
+				
+				var changed = true;
+				var polygons = [];
+				var segments = [];
+				var polygon = [];
+				
+			  //document.addEventListener( 'click', onDocumentMouseClick, false );
+			  canvas.addEventListener("mousedown", mouseDownListener, false);
+				setup();
+				requestAnimFrame(update);
+
+				function setup() {
+					polygons.push([[-1,-1],[width+1,-1],[width+1,height+1],[-1,height+1]]); //Bounding box.
+			    
+			    	polygons.push([[520,320],[520,230],[565,230],[580,245],[610,245],[640,230],[700,230],[715,260],[640,260],[640,290],[685,290],[685,320],[610,320],[580,275],[550,320]]); //X-shaped.
+			    	//polygon.push([520,320],[520,230],[565,230],[580,245],[610,245],[640,230],[700,230],[715,260],[640,260],[640,290],[685,290],[685,320],[610,320],[580,275],[550,320]);
+					
+			    	polygons.push([[200, 200], [220, 200], [220, 180], [140, 180], [140, 160], [160, 160], [160, 140], [60, 140], [60, 120], [160, 120], [160, 20], [180, 20], [180, 160], [220, 160], [220, 140], [240, 140], [240, 160], [260, 160], [260, 120], [280, 120], [280, 160], [300, 160], [300, 140], [320, 140], [320, 160], [360, 160], [360, 180], [240, 180], [240, 200], [260, 200], [260, 220], [240, 220], [240, 240], [380, 240], [380, 260], [360, 260], [360, 280], [380, 280], [380, 300], [360, 300], [360, 320], [340, 320], [340, 260], [320, 260], [320, 320], [300, 320], [300, 260], [280, 260], [280, 380], [260, 380], [260, 360], [220, 360], [220, 340], [260, 340], [260, 260], [240, 260], [240, 320], [220, 320], [220, 300], [200, 300], [200, 440], [180, 440], [180, 420], [160, 420], [160, 460], [140, 460], [140, 420], [120, 420], [120, 560], [100, 560], [100, 540], [60, 540], [60, 520], [100, 520], [100, 420], [40, 420], [40, 400], [180, 400], [180, 300], [160, 300], [160, 360], [140, 360], [140, 300], [100, 300], [100, 280], [120, 280], [120, 260], [20, 260], [20, 240], [120, 240], [120, 200], [140, 200], [140, 280], [220, 280], [220, 260], [180, 260], [180, 240], [220, 240], [220, 220], [200, 220]]); //Long, dark corridors.
+
+			    	polygons.push([[1012, 8], [1060, 54], [1023, 140], [1050, 106], [1199, 76], [1161, 69], [1180, 34], [1186, 58], [1191, 32], [1222, 88], [1210, 100], [1216, 159], [1275, 161], [1285, 91], [1236, 78], [1226, 83], [1186, 7], [1146, 72], [1111, 75]]); //Weird shape with a star.
+
+			    	polygons.push([[820, 220], [820, 430], [930, 430], [930, 460], [820, 460], [820, 640], [890, 640], [890, 710], [1000, 710], [1000, 530], [960, 530], [960, 500], [1000, 500], [1000, 430], [1030, 430], [1030, 500], [1070, 500], [1070, 530], [1030, 530], [1030, 710], [1180, 710], [1180, 670], [1210, 670], [1210, 710], [1310, 710], [1310, 530], [1210, 530], [1210, 570], [1180, 570], [1180, 500], [1310, 500], [1310, 320], [1180, 320], [1180, 290], [1310, 290], [1310, 220], [960, 220], [960, 290], [1100, 290], [1100, 320], [930, 320], [930, 220]]); //Blocky building.
+
+			    	polygons.push([[560, 34], [575, 200], [600, 100], [625, 200], [650, 100], [675, 200], [700, 100], [725, 200], [750, 100], [775, 200], [800, 100], [825, 200], [850, 100], [875, 200], [900, 100], [925, 200], [950, 34]]); //Crown.
+
+			    	polygons.push([[1145, 390], [1258, 384], [1258, 452], [1120, 445]]); //Hole inside blocky building.
+			    	polygons.push([[868, 270], [917, 266], [920, 377], [868, 362]]); //Hole2 inside blocky building.
+			    	//polygons.push([[416, 414], [534, 420], [392, 484], [545, 497]]);
+
+			    	//polygons.push([])
+			    
+					segments = convertToSegments(polygons);
+
+					//answers = generate_triangulation_and_guard_pos(polygon);
+
+					//triangulatePolygon(answers[0]);
+					//drawGuards(answers[1]);
+			    	
+					//segments = /*VisibilityPolygon.*/breakIntersections(segments);
+				};
+
+				function triangulatePolygon(triangulations){
+					var canvas = document.getElementById('canvas');
+					var ctx = canvas.getContext("2d");
+
+					//console.log("Triangulations:" + triangulations);
+
+					for (var i = 0; i < triangulations.length; ++i) {
+						//console.log("Iterations:" + i);
+						ctx.beginPath();
+						ctx.moveTo(triangulations[i][0][0], triangulations[i][0][1]);
+						ctx.lineTo(triangulations[i][1][0], triangulations[i][1][1]);
+						ctx.strokeStyle = "white";
+						ctx.lineWidth = 2;
+						ctx.stroke();
+
+						ctx.beginPath();
+						ctx.moveTo(triangulations[i][1][0], triangulations[i][1][1]);
+						ctx.lineTo(triangulations[i][2][0], triangulations[i][2][1]);
+						ctx.strokeStyle = "white";
+						ctx.lineWidth = 2;
+						ctx.stroke();
+					}
+				}
+
+				function drawGuards(guards){
+
+				}
+
+				function update() {
+					/*if(menu.Animate){
+						while(observer_x < width){
+							observer_x++;
+							draw()
+						}
+					}*/
+					if (changed) {
+						var canvas = document.getElementById('canvas');
+						var ctx = canvas.getContext("2d");
+						ctx.clearRect(0, 0, width, height);
+						ctx.beginPath();
+						ctx.rect(0, 0, width, height);
+						ctx.fillStyle = '#666';
+						ctx.fill();
+
+						draw(ctx);
+						changed = false;
+					}
+					requestAnimFrame(update);
+				};
+
+				function draw(ctx) {
+			    //console.log("Line segments:" + segments);
+			    	var polys = [];
+			    	for(var i=0;i<numGuards;i++){
+			    		polys.push(compute([observerX[i], observerY[i]], segments));
+			    	}
+
+			    	//var intersectPolygons = convertPolygonsAndComputeIntersection(polys[0], polys[1]);
+			    	//console.log("Intersection:" + intersectPolygons);
+
+					/*var poly = compute([observer_x, observer_y], segments);
+					var poly2 = compute([observer_x2, observer_y2], segments);*/
+			    //console.log("Visibility polygon:" + poly);
+
+					for (var i = 1; i < polygons.length; ++i) {
+						ctx.beginPath();
+						ctx.moveTo(polygons[i][0][0], polygons[i][0][1]);
+						for (var j = 1; j < polygons[i].length; ++j) {
+							ctx.lineTo(polygons[i][j][0], polygons[i][j][1]);
+						}
+						//ctx.fillStyle = "orange";
+			      		ctx.fillStyle = "black";
+
+			      		if(i == polygons.length-1 || i == polygons.length-2){
+			      			ctx.fillStyle = "brown";
+			      		}
+
+						ctx.fill();
+					}
+
+					for(var i=0;i<numGuards;i++){
+						ctx.beginPath();
+						ctx.moveTo(polys[i][0][0], polys[i][0][1]);
+						for (var j = 1; j < polys[i].length; ++j) {
+							ctx.lineTo(polys[i][j][0], polys[i][j][1]);
+						}
+						//ctx.fillStyle = "#222";
+			    		ctx.fillStyle = "#ffff66";
+						ctx.fill();
+					}
+
+					/*ctx.beginPath();
+					ctx.moveTo(poly[0][0], poly[0][1]);
+					for (var i = 1; i < poly.length; ++i) {
+						ctx.lineTo(poly[i][0], poly[i][1]);
+					}
+					//ctx.fillStyle = "#222";
+			    	ctx.fillStyle = "#ffff66";
+					ctx.fill();
+
+					ctx.beginPath();
+					ctx.moveTo(poly2[0][0], poly2[0][1]);
+					for (var i = 1; i < poly2.length; ++i) {
+						ctx.lineTo(poly2[i][0], poly2[i][1]);
+					}
+					//ctx.fillStyle = "#222";
+			    	ctx.fillStyle = "#ffff66";
+					ctx.fill();*/
+
+					for (var i = 0; i < segments.length; ++i) {
+						ctx.beginPath();
+						ctx.moveTo(segments[i][0][0], segments[i][0][1]);
+						ctx.lineTo(segments[i][1][0], segments[i][1][1]);
+						ctx.strokeStyle = "black";
+						ctx.lineWidth = 2;
+						ctx.stroke();
+					}
+
+					for(var i=0;i<numGuards;i++){
+						ctx.beginPath();
+						ctx.arc(observerX[i], observerY[i], 8, 0, Math.PI*2, true);
+						ctx.fillStyle = "yellow";
+						ctx.fill();
+						ctx.strokeStyle = "black";
+						ctx.stroke();						
+					}
+					
+					//console.log("Intersection polygon length:" + intersectPolygons.length);
+
+					/*for(var i=0;i<intersectPolygons.length;i++){
+						ctx.beginPath();
+						ctx.moveTo(intersectPolygons[i][0].x, intersectPolygons[i][0].y);
+						for(var j=1;j<intersectPolygons[i].length;j++){
+							ctx.lineTo(intersectPolygons[i][j].x, intersectPolygons[i][j].y);
+						}
+						ctx.fillStyle = "#e6e600";
+						ctx.fill();
+						ctx.strokeStyle = "white";
+						ctx.stroke();
+					}*/
+
+					/*ctx.beginPath();
+					ctx.arc(observer_x, observer_y, 8, 0, Math.PI*2, true);
+					ctx.fillStyle = "yellow";
+					ctx.fill();
+					ctx.strokeStyle = "black";
+					ctx.stroke();
+
+					ctx.beginPath();
+					ctx.arc(observer_x2, observer_y2, 8, 0, Math.PI*2, true);
+					ctx.fillStyle = "yellow";
+					ctx.fill();
+					ctx.strokeStyle = "black";
+					ctx.stroke();*/
+				};
+			};
+
+function check_inside(point,poly){
+  // Return true if the [x,y] point is in the polygon, which
+  // is guaranteed to be simple.
+  var EPSILON = 0.000001;
+  var end = [point[0], 2*height];
+  var num_intersects = 0;
+  for (var i = 0; i < poly.length; i++) {
+    var v1 = poly[i];
+    var v2 = poly[(i+1)%poly.length];
+    // bump them if they are in line with the guard
+    if(v1[0]==point[0]) v1=[v1[0]+EPSILON, v1[1]];
+    if(v2[0]==point[0]) v2=[v2[0]+EPSILON, v2[1]];
+    var ires = intersect_edges(point,end,v1,v2);
+    if(ires.a>=0 && ires.b >= 0 && ires.b < 1){
+      num_intersects++;
+    }
+  };
+  return (num_intersects%2) == 1;
+}
+
+function intersect_edges(a1,a2,b1,b2){
+  // s a1x + (1-s) a2x = t b1x + (1-t) a2x
+  var a = a1[0];
+  var b = a2[0]-a1[0];
+  var c = b1[0];
+  var d = b2[0]-b1[0];
+  var e = a1[1];
+  var f = a2[1]-a1[1];
+  var g = b1[1];
+  var h = b2[1]-b1[1];
+  var det = determinant(b,-d,f,-h);
+  var a_time = determinant(c-a,-d,g-e,-h)/det;
+  var b_time = determinant(b,c-a,f,g-e)/det;
+  return {a:a_time,b:b_time};
+}
+
+function determinant(a,b,c,d){
+  return a*d - b*c;
+}
+
+  		</script>
+	</body>
+</html>

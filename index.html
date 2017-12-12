@@ -1,8 +1,20 @@
 ﻿<html>
 	<head>
 		<title>Computational Geometry Project (CSCI 716): The Art Gallery Problem</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			table, th, td {
+				border: 1px solid black;
+			}
+			img {
+				max-width: 100%;
+				max-height: 100%;
+				height: auto; 
+			}
+		</style>
 	</head>
-	<body>
+	<body onload="init();">
 		<br>
 		<section>
 			<H1 align="center"><b>Computational Geometry (CSCI 716) Project: The Art Gallery Problem</b></H1>
@@ -10,6 +22,7 @@
 			<H3 align="center"><a href="#proposal">1. Project Proposal</a></H3>
 			<H3 align="center"><a href="#preliminaryResults">2. Preliminary Results</a></H3>
 			<H3 align="center"><a href="#preliminaryResults2">3. Preliminary Results 2.0</a></H3>
+			<H3 align="center"><a href="#finalReport">4. Final Report</a></H3>
 		</section>
 		<br>
 		<br>
@@ -256,6 +269,493 @@
 			<p>[1] <i>Wikipedia - Visibility Polygon.</i> <a href="https://en.wikipedia.org/wiki/Visibility_polygon">Visibility Polygon</a></p>
 			<p>[2] <i> Joseph O'Rourke.  </i><a href="http://cs.smith.edu/~jorourke/books/ArtGalleryTheorems/art.html">Art Gallery Theorems and Algorithms.</a></p>
 			<p>[3] <i>Red Blog Games.</i> <a href="https://www.redblobgames.com/articles/visibility/">2D Visibility</a></p>
+		</section>
+		<br>
+		<br>
+		<hr>
+		<hr>
+		<hr>
+		<br>
+		<br>
+		<section>
+			<a name="finalReport" />
+			<H2 align="center">The Art Gallery Problem</H2>
+			<H4 align="center">Akshay Sharma, Darshan Kavathe</H4>
+			<H4 align="center">(<a href="mailto:acs1246@rit.edu">acs1246@rit.edu</a>, <a href="mailto:dck1135@rit.edu">dck1135@rit.edu</a>)</H4>
+			<H4 align="center">CSCI 716: Computational Geometry</H4>
+		</section>
+		<br />
+		<br />
+		<section>
+			<H2 align="center">Problem Overview</H2>
+			<p align="justify">
+				The art gallery problem (also called the museum problem) is basically a visibility problem in computational geometry. It is notably included among the open problems in the field which has been attempted by several researchers and practitioners over decades. It is named after the real world problem of securing or illuminating the entire interior of an art gallery (or a museum) using the minimum possible guards (or lights/cameras). The polygons generally considered while solving the problem are simple polygons and a point is usually termed as visible from another if the line joining the two lies completely within the polygon without hitting any obstacles in its path. Our goal is to look at the research that has already been done in this field and attempt to implement some of them while at that same time modifying approaches as we may see fit.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Background</H2>
+			<p align="justify">
+				The polygons usually considered as part of this problem are all termed ‘simple’. Simple polygons possess the following properties: they enclose a region with a definite, measurable area, their edges meet only at the ends, no more than two edges meet at a vertex and the number of edges present always equals the number of vertices. So, the polygons considered are not necessarily monotone in nature, they may contain inner walls and potentially even obstructions within them commonly termed ‘holes’ in the literature. Originally, Victor Klee had posed the problem this problem as an open question.
+				Visibility from a point is defined as the area inside the art gallery visible from that point i.e., we can draw a straight line from the point to any other point in that area without crossing the boundaries of polygon.
+
+				There are some variation of this problem based on guard placement and movement:
+				Vertex Guards: Guards are placed only at vertices of polygon.
+				Edge Guards: Guards can move along the edges of polygon.
+				Point Guards: Guards can be placed anywhere in the polygon.
+				Stationary Guards: Guards remain in the same position.
+				Mobile Guards: Guards can move along a path inside polygon (usually restricted to diagonals or edges).
+				Hidden Guards: No two guards are visible to each other.
+				Guarded Guards: Every guard is visible to at least one other guard.
+
+				Victor Klee’s question pertained to stationary guards. Chvatal answered by proving that a simple polygon needed at most n/3 guards. Fisk then provided a proof for Chvatal’s result using triangulation and colouring. Avis and Toussaint came up with an algorithm for positioning guards in O(n log n) time. O’Rourke then proved that a simple polygon needed at most n/4 mobile guards. Rourke also went on to prove that simple polygons with holes  required at most n+2h/3 vertex guards. Kahn proved that n/4 guards were sufficient for orthogonal polygons. This was done through convex quadrilateralization followed by colouring. Aggarwal then showed that 3n+4/16 mobile guards sufficed for orthogonal polygons. It has been repeatedly proven that the art gallery problem is an NP hard problem by reducing it to the well known set cover problem.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Proof of NP - Hardness</H2>
+			<p align="justify">
+				The set cover problem was one of the original NP complete problems among Karp’s 21 NP complete problem. It refers to the problem of finding the smallest subset of a given set that would be its equivalent. Basically, given a universal set U, and a bunch of subsets s1, s2,..., sn, the optimization version of the problem (which is proven to be NP Hard), requires us to find the most minimal combination of the subsets such that they fully ‘cover’ U or contain all the items in U. 
+			</p>
+			<p  align="justify">
+				In the art gallery problem, there are analogues to the sets mentioned above. Given the art gallery polygon ‘P’, we first need to partition it into several convex polygons that tend to share vertices known as convex fans. This partitioning can be done by joining pairs of vertices in the polygon and then extending them in both directions till the line hits the outer boundary of the polygon. The polygon resulting from this procedure is termed an ‘Arrangement’ in the literature. Let call this arrangement ‘A’. Every polygon formed due to A is convex in nature. Each of these polygons are known as ‘cells’ in the literature. Each of these cells lies on a ‘fan’ in the polygon. Several such cells may share a fan. Given these conditions, we can reformulate the art gallery problem to have a set S consisting of the convex cells in the arrangement A and the objective is to find the set C which consists of the minimum number of vertices of P that are needed to completely cover S. This can be accomplished by choosing the number of vertices whose fans cover all the cells of A, which constitutes the set cover problem.
+			</p>
+			<p  align="justify">
+				The figure on the left below is a popular representation of the set cover problem and the one on the right shows how an art gallery polygon P would need to be partitioned in order to arrive at the optimal solution.
+			</p>
+			<br>
+			<p align="center">
+				<img src="images/Set Cover.PNG" alt="Set Cover Illustration">
+				<img src="images/Division into an Arrangement.PNG" alt="Partitioning Illustration">
+			</p>
+			<br>
+			<p align="justify">
+				Commonly optimization problems of this nature are solved using a method called Integer Linear Programming (ILP) which optimizes the answer at each of the iterative steps it takes. As we shall see, ILP can also be successfully applied to the art gallery problem to yield optimal solutions.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Known Bounds and Results</H2>
+			<p align="justify">
+				These are some proved lower bounds on number of guards in general and orthogonal polygon.
+			</p>
+			<table style="width:100%;">
+			  <tr>
+			    <th></th>
+			    <th align="center">Stationary Guards</th> 
+			    <th align="center">Mobile Guards</th>
+			  </tr>
+			  <tr>
+			    <td align="center">General</td>
+			    <td align="center">n/3 (Chvatal)</td> 
+			    <td align="center">n/4 (O'Rourke)</td>
+			  </tr>
+			  <tr>
+			    <td align="center">Orthogonal</td>
+			    <td align="center">n/4 (Kahn)</td> 
+			    <td align="center">(sn+4)/16 (Aggarwal)</td>
+			  </tr>
+			</table>
+			<p align="justify">
+				Other than these, Chazelle came up with O(n3) dynamic algorithm for convex partitioning. Using which art gallery problem can be reduced to set cover problem which is known to be NP-Hard, but approximation algorithms exist.  Ghosh (2010) gave O(n4) time approximation algorithm for minimum vertex guard problem. There are some algorithm which use linear integer programming for approximation.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center"> Our Approaches</H2>
+		</section>
+		<br>
+		<section>
+			<H3 align="center">Approach 1: Triangulation and 3-Colouring</H3>
+			<p align="justify">
+				True to the first approach proven and tried in the literature, we decided to implement a solution using triangulation and 3-colouring of a given polygon. Obviously we realized that this alone would never give us the optimal solution, but we thought it would be a good starting point from where further augmentations could seriously be thought about. Our solution performs triangulation of input polygons using the line sweep approach so it is divided into two parts: monotone sub-division and polygonal triangulation of the individual polygons. 
+			</p>
+			<p align="justify">
+				Monotone sub-division is important for the algorithm to proceed because the triangulation approach assumes that it is dealing with such a polygon and this makes it much easier to do. We first check if the given polygon is already monotone by dividing it into upper and lower chains about the leftmost and rightmost vertices. We then walk along each of these chains to ensure they are always non-decreasing in nature. If this is indeed the case, we can proceed straight to the triangulation portion of the algorithm. If not, we have to perform a left to right sweep across the polygon and attempt to identify the merge and split vertices within the polygon. We add all the vertices of the polygon we encounter into a tree which is ordered by the x value of the vertex. We also maintain the sweep-line using a balanced tree that stores the edges at any point ordered by the y-coordinates. If we encounter multiple line segments emanating from a single point in the polygon, we identify the immediately previous occurring vertex as a split vertex. We use the x-coordinate to search the tree and check which is the previous vertex. We deal with it immediately by adding a diagonal to the polygon by attaching the split vertex with a previous point in the polygon below the uppermost line segment present. If there are multiple such points present in the polygon, we use the point with the highest y coordinate. Before creating this diagonal, we first make sure that the point is visible from the split vertex. A merge vertex can be identified when two line segments in the polygon intersect and yet the polygon is not over yet. In this case, we remember the merge vertex and wait to encounter the next vertex in the polygon which is visible to the merge vertex. When such a vertex is encountered, we add a diagonal attaching the two. These are two types of vertices we can encounter to enable subdivision. They may occur in varying configurations but handling them as mentioned above will ensure several monotone polygons at the end. Because of the need to iterate through all the points in the polygon and having to constantly access a balanced tree data structure, the complexity for this step is: n * log n, so O(n log n). 
+			</p>
+			<p align="justify">
+				After this step, we proceed to triangulate each of the polygons that have been created. This is done by sweeping across the polygon from the vertex with the lowest value of x to that with the highest. Since we already have a list of sorted vertices from step 1, we can use the same here. As we sweep across, we check for visibility between vertices and attach them if required while checking to make sure we do not intersect any other diagonals. This happens in a manner suitable for the creation of convex fans in our polygon. The more the number of vertices in the opposite side a particular vertex can ‘see’, the more the diagonals that will be drawn to it. This will come in handy later when we 3-colour our graph since the vertex of the convex fan will remain a single colour and simplify colouring for us. Reflex chains are also identified in this manner and diagonal added. By the end, the algorithm has proceeded through each of the monotone polygons and triangulated them all. Each diagonal can be created in constant time for the purposes of our algorithm. And since each triangulation requires the creation of (n-3) polygons, where n is the number of vertices in each monotone polygon, the overall complexity of this step is: O(n).
+			</p>
+			<br>
+			<p align="center">
+				In the figures below, the vertices marked in red act as convex fans. They are a meeting point for several diagonals drawn between vertices in the figure.
+			</p>
+			<br>
+			<p align="center">
+				<img src="images/ConvexFans.PNG" alt="Convex Fans Illustration">
+			</p>
+			<br>
+			<p align="justify">
+				Thus, overall this algorithm has a complexity of: O(n log n). The major portion of it is dominated by the monotone subdivision step.
+			</p>
+			<p align="justify">
+				Some pseudocode which will give more clarity about our approach:
+				<br>
+				Algorithm monotonize(P):<br>
+				Input. A simple polygon P stored as a list of vertices D.<br>
+				Output. A partitioning of P into monotone sub-polygons, stored in another list E. <br>
+				1. Construct a priority queue-like structure Q using the vertices of P, using their y-coordinates as priority. If two points have the same y-coordinate, then select the one with smaller x-coordinate to have higher priority. <br>
+				2. Initialize an empty binary search tree T. <br>
+				3. while Q is not empty. <br>
+				4. 	remove the vertex with the highest priority from Q. <br>
+				5. 		Handle the vertex, based on its type. <br>
+
+				If it is a start vertex, <br>
+				1. Insert it into T. <br>
+
+				Else If it is an end vertex,<br>
+				1. Check if the there is an unmatched merge vertex.<br>
+				2. 	If so, then add a diagonal between the end vertex and the merge vertex.<br>
+
+				Else if it is a split vertex,<br>
+				1. Search in T to find the closest vertex before it that is also visible to it. <br>
+				2. Once found, add a diagonal between the two vertices.<br>
+
+				Else if it is a merge vertex,<br>
+					1.  Remember the merge vertex. Add it to a stack so that it can be popped out when it gets connected to another vertex using a diagonal.<br>
+
+				Else (it is a regular vertex),<br>
+				1. Add it to the T in the required position.<br>
+
+				Algorithm TriangulateMonotonePolygons(P) <br>
+				Input. A y-monotone polygon P stored in a list D. <br>
+				Output. A triangulation of P stored in a list D. <br>
+				1. Iterate across the polygons from left to right.<br>
+				2. Initialize a stack , and continuously push vertices into it based on whether they are in the upper or lower chain.<br>
+				3. On each iteration: <br>
+				4. 	If vertex 1 and vertex 2 are on different chains <br>
+				5. 		then Pop all the  vertices from S. <br>
+				6. 			And then Insert a diagonal from the vertex to each popped vertex, other than the last vertex,<br>
+				8. 	else Pop one vertex from S. <br>
+				9. 		Pop the other vertices from S as long as the diagonals lie inside P. Insert these diagonals into D. Push the last vertex that has been popped back onto S.<br>
+			</p>
+			<p align="justify">
+				Figures showing results are below. For each of the figures, the red line segments represent the sides of the art gallery polygon, the green line segments represent the triangulations generated by our algorithm, the yellow, cyan and dark blue vertices are the results of our 3-colouring and the colour with the crosses represent the positions of the guards. Several of the figures have been scaled down in order to fit them into the report but the images can be viewed separately if desired.
+			</p>
+			<br>
+			<br>
+			<p align="center">1) This is a figure with 150 vertices. The light blue coloured vertices with the crosses in them are the guards.</p>
+			<p align="center">
+				<img src="images/Triangulation150Vertices.PNG" alt="Polygon with 150 vertices">
+			</p>
+			<br>
+			<br>
+			<p align="center">2) This is a figure with 200 vertices. The dark blue vertices show the positions of guards in this structure.</p>
+			<p align="center">
+				<img src="images/Triangulation200Vertices.PNG" alt="Polygon with 200 vertices">
+			</p>
+			<br>
+			<br>
+			<p align="center">3) This is a figure with 400 vertices. The yellow coloured vertices with the crosses denote the guards.</p>
+			<p align="center">
+				<img src="images/Triangulation400Vertices.PNG" alt="Polygon with 150 vertices">
+			</p>
+			<br>
+			<br>
+			<p align="center">4) This is a von koch figure with 500 vertices. The yellow vertices are the guards.</p>
+			<p align="center">
+				<img src="images/Triangulation500VonKochPolygon.PNG" alt="Polygon with 150 vertices">
+			</p>
+			<br>
+			<br>
+			<p align="center">5) This is a polygon representing the interior of the St.Sernin Cathedral in Toulouse, France. The dark blue vertices represent the guards.</p>
+			<p align="center">
+				<img src="images/TriangulationLessVertices.PNG" alt="Polygon with 150 vertices">
+			</p>
+			<br>
+			<br>
+			<p align="center">6) This is a simple polygon with 5 vertex guards shown in cyan.</p>
+			<p align="center">
+				<img src="images/TriangulationStSerninCathedral.PNG" alt="Polygon with 150 vertices">
+			</p>
+			<br>
+			<br>
+		</section>
+		<br>
+		<section>
+			<H3 align="center">Approach 2: Augmenting using Reflex Vertices</H3>
+			<p align="justify">
+				In an any convex polygon it is evident that one guard will be enough to guard it, as all points within the polygon are visible from all other points within polygon. If there is only one reflex vertex, all points are still visible from the reflex vertex. This led us to believe, type of vertex have pivotal role in deciding minimum guard points. O’rourke has proved that placing guard at all reflex vertices is sufficient to cover art gallery, but it's not always guaranteed to give better solution than existing n/3 lower bound. Justin Iwerks et al. have summarized lower bound for guards in terms of reflex and convex vertices.
+			</p>
+			<p align="center">
+				<img src="images/ReflexVertices1.PNG" alt="Reflex Vertex Examples">
+			</p>
+			<p>
+				Guards at reflex vertices, better than existing ⌊n/3⌋ lower bound if  r ≤ ⌊c/2⌋
+				r = reflex vertices, c = convex vertices, r + c = n <br>
+				Number of sufficient guards 	= 1		If r = 0 <br>
+												= r		If r ≤ ⌊c/2⌋ <br>
+												= ⌊n/3⌋ 	If ⌊c/2⌋ <  r  < 5c−12 <br>
+												= 2c-4 		If r  ≥  5c-12 <br>
+			</p>
+			<p align="justify">
+				These lower bound conditions can be used to determine if three coloring method is giving better solution. reflex vertices in a polygon can be identified in O(n) time, using determinant method.  
+			</p>
+			<p align="center">
+				<img src="images/ReflexVertices2.PNG" alt="Reflex Vertex Examples2">
+			</p>
+			<p align="justify">
+				As we can see in above polygon, both approaches do not yield minimum vertex solution, but are sufficient for art gallery coverage problem. More importantly, if  r ≤ ⌊c/2⌋, we can find equivalent or more optimal solution than 3 coloring approach in O(n) time.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H3 align="center">Approach 3: Augmenting using Visbility Polygons and Overlaps</H3>
+			<p align="justify">
+				Since approaches one and two alone don’t guarantee an optimal solution, we turned to the problem of visibility, i.e., calculating the vision of a guard given a set of polygons in a scene. Visibility polygons are a common method to represent the field of visibility of a given point in space. In 2D space, the area enclosed by the visibility polygon would represent all the points on the plane visible to that point. Visibility polygons are commonly used to model visibility in robotics as well as video games so they seemed like a good approach to take in our project.
+			</p>
+			<p align="justify">
+				Naive algorithms to calculate visibility polygons involved uniformly casting rays from the selected point in all possible directions. Clearly, casting rays in all directions from 0 to 359 degrees would have been overkill for an algorithm, not to mention the problems with precision we would have encountered if we attempted to do so. Popularly, this is implemented by casting the rays with at intervals but this can often lead to small obstacles being overlooked. Moreover, his solution may have been theoretically simple to implement but computationally impractical. So we decided to go with a more plausible approach: casting rays to each of the vertices of the objects in the scene. This way, we can clearly figure out which objects are occluded and also, the cost is not too much.
+			</p>
+			<p align="justify">
+				Our implementation knows at all times the locations vertices of the polygons contained within it. So we cast rays to each of them. In order to do so, we start by scanning for vertices from 0 degrees, or a line parallel to the x-axis and then go around till we reach the x-axis again. Each time we encounter a vertex, we add it to our visibility polygon. If another vertex occurs at the same angle with respect to the point but further away, we determine that a portion of the object is occluded and carry on. After we have completed the entire circular scan, we stitch together the visibility polygon and fill in the area of the polygon to clearly denote its extent. Implemented this way, the algorithm takes O(n2) time since we need to check intersections with all n points in the polygon which is an operation on its own. 
+			</p>
+			<p align="justify">
+				Instead of just sticking with this approach, we decided to augment it further by storing the object in a balanced tree structure based on angle with respect to the point, and then by distance, so that looking them up would be a constant time operation for any point. Building up the tree takes O(n) time for each guard location being checked. If the guard is dragged around in the interactive application we made, each drag coordinate will regenerate the tree. This could help augment our previous implementation by potentially acting as an index - if that guard location is checked again, we can just use the previously generated treat to create the visibility polygon quickly. 
+			</p>
+			<p align="justify">
+				Figures showing our results are below:<br><br>
+				For all the figures, the yellow circle represents a potential position for a guard, the grey region is outside the polygon, the black region is the unguarded portion inside the gallery, red coloured polygons are obstacles or ‘holes’ within the gallery and the yellow region is the visibility polygon generated for the guard and illustrates the line of sight. For our experiments, we have given the guards 360 degree unbounded vision which is obviously flawed in a real world scenario but suffices for experimental purposes.
+			</p>
+			<br>
+			<p align="center">1) The figure below shows a block-like shaped polygon with obstacles inside.</p>
+			<p align="center">
+				<img src="images/ReportVisbilityBlockShaped.PNG" alt="Block Shaped Polygon">
+			</p>
+			<br>
+			<br>
+			<p align="center">2) The figure below shows a gallery with long, thin corridors.</p>
+			<p align="center">
+				<img src="images/ReportVisibilityCorridors.PNG" alt="Polygon with Corridors">
+			</p>
+			<br>
+			<br>
+			<p align="center">3) The figure below shows a gallery shaped roughly like an X.</p>
+			<p align="center">
+				<img src="images/ReportVisbilityXShaped.PNG" alt="X Shaped Polygon">
+			</p>
+			<br>
+			<br>
+			<p align="center">4) The figure below shows a gallery with a crown-like shape, a popular test case for art galleries.</p>
+			<p align="center">
+				<img src="images/ReportVisbilityReverseCrownShaped.PNG" alt="Reverse Crown Shaped Polygon">
+			</p>
+			<br>
+			<br>
+			<p align="center">5) The figures below show a gallery with an abnormal shape consisting of a star-like polygon and a pentagon connected with a narrow corridor.</p>
+			<p align="center">
+				<img src="images/ReportVisbilityWeird1.PNG" alt="Weird Polygon">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityWeird2.PNG" alt="Weird Polygon2">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityWeird3.PNG" alt="Weird Polygon3">
+			</p>
+			<br>
+			<br>
+			<p align="center">6) This is the overall scene with various configurations of guard(s) placed.</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAll1.PNG" alt="Full Scene1">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAll1-2.PNG" alt="Full Scene2">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAll1-3.PNG" alt="Full Scene3">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAll3.PNG" alt="Full Scene with 3 Guards">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAll10.PNG" alt="Full Scene with 10 Guards">
+			</p>
+			<p align="center">
+				<img src="images/ReportVisbilityAllSeveral.PNG" alt="Full Scene with a Large Number of Guards">
+			</p>
+			<br>
+			<p align="justify">
+				We also attempted to calculate and display the overlap between two visibility polygons. Unfortunately, the library we used to calculate the polygonal intersection turned out to be too slow for our interactive application. It would also slow down drastically if the overlapping area was too large. We were forced to test it only for cases where the overlaps were miniscule. The colour scheme for the results is similar to the above figures but with the added presence of a darker yellow portion outlined in white which represents the intersection polygon of the two guards’ visibility polygons. A few of our results are shown below:
+			</p>
+			<br>
+			<p align="center">1) The figure below shows two guards inside a polygon that also contains an obstacle (in red). The two visibility polygons share a small corner of overlap.</p>
+			<p  align="center">
+				<img src="images/VisibilityOverlap.PNG" alt="Visibility Overlap">
+			</p>
+			<br>
+			<br>
+			<p align="center">2) The figure below shows two guards outside a polygon with a small quadrilateral overlap for their visibility.</p>
+			<p  align="center">
+				<img src="images/VisibilityOverlap2.PNG" alt="Visibility Overlap">
+			</p>
+			<br>
+			<br>
+			<p align="center">3) The figure below shows two more guards inside a polygon with an almost rhombus shaped overlap in their visibilities.</p>
+			<p  align="center">
+				<img src="images/VisibilityOverlap3.PNG" alt="Visibility Overlap">
+			</p>
+			<br>
+			<br>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Shortcomings</H2>
+			<p align="justify">
+				As can be clearly seen, out approaches are not ideal. Traditionally, triangulation has been the bottleneck for all approaches used to solve the art gallery problem. Initially, the fastest algorithms to do them were O(n log n), which is what we have implemented. Implementing the O(n log log n) approach proved to time consuming and the best known O(n) method was deemed out of reach and convoluted for us. We chose to augment our approach using the reflex vertex approach. We believe this a nice way to segregate and quickly solve those polygons where the number of reflex vertices is less than or equal to half the number of convex ones and can lead to considerable speed ups for those particular cases. Still, if the condition does not hold, triangulation and colouring has to be done. And out approach to doing these are not optimal. The greedy colouring method we have utilized might not be ideal for large polygons. Also, partitioning large and complicated polygons into smaller, monotone polygons can become time consuming. Moreover, using 3-colouring alone for all polygons is not the best approach. This may work for normal polygons but does not produce good results for orthogonal ones. For those, 4-colouring followed by quadrilateralization is the recommended approach. Our solution can give minimal guard positions for some orthogonal polygons but not for all. Ideally, a more complicated technique would need to be employed that can identify the type of polygon being used and then choose an appropriate convex partitioning technique accordingly.
+			</p>
+			<p align="justify">
+				Our reflex approach currently needs to iterate through all the vertices in the polygon to identify if triangulation is required. This could potentially increase computation time if the polygons being considered are gigantic.
+			</p>
+			<p align="justify">
+				Our visibility approach can be used to minimize guards after 3-colouring has been done by checking for guards whose visibility polygons are proper subsets of others’, but this would require computing the overlaps between every possible combination of pairs of guards found earlier in the algorithm, which is again not a computationally simple task. Even if we just want to illustrate the overlaps between the visibility polygons of different sets of guards, the computation is not necessarily fast always. 
+			</p>
+			<p align="justify">
+				Also, our method involves several small adjustments to fight the constant war against precision that commonly occurs in geometrical problems. To prevent weird computations from occurring, guards are always placed slightly to the left or right of a vertex leading to awkward results sometimes when the guard should be able to see both inside and outside the art gallery. Visually, this means interior visibility is always fine but exterior visibility is constrained to only one side of the polygon.
+			</p>
+			<p align="justify">
+				Large scenes with several polygons could cause slow downs to polygon computation due to the number of rays needed to be cast for each guard. We tested our implementation with a maximum of 300 vertices totally and experienced not too much slow down but this is guaranteed to appear eventually. Also, adding too many guards to the scene can slow down the overall program since each guard would generate its own visibility polygon that would need to be changeable when dragged. 
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Challenges</H2>
+			<p align="justify">
+				The biggest challenge we faced throughout the project was the sheer amount of material available on the space. Since it is a well studied problem in computational geometry, several people have tried their hand at it. The literature is not always clear regarding which variant of the problem is being written about. Although we decided to concentrate on vertex guards for our approach, there were several papers with suggestions for edge guards, point guards and other variants. And wading through all this material was time consuming to say the least. Also, several papers tried to solve the same problems in very similar ways but with tiny tweaks built in. Since not all the papers talk in explicit terms about the algorithms they used - they tend to mention the approach in more roundabout ways - it took us a while to understand what these subtle differences were and internalize them. We also took a while to understand why different approaches might be required for polygons of different shapes. Initially we were trying to tackle all kinds of polygons with the same generic method. There are also results in the literature that have been derived using relationships between different variants of the art gallery problem. It took us a while to gather several of these and go through them to understand these connections and the conclusions arrived at because of them. Furthermore, several optimal proofs in the literature tend to be quite mathematically dense and convoluted. A stand out in this regard is the Chazelle paper that proves that polygon triangulation can actually be done in linear time. The approach described has been deemed impractical for real world applications because of the sheer amount of work required to achieve the result. Similarly, several of the papers that described the best run times turned out to be beyond our reach. Another constant challenge was dealing with precision in our approaches. We constantly had problem with zero division while finding slopes or determinants. We used epsilon to offset the error in most cases. But as discussed before, it does not necessarily give the best results always. We had to sacrifice some accuracy in order to get functional demos. Finally, as mentioned earlier, we found it hard to gather input polygons for our testing and even when we did find some, they were in different formats that would require pre-processing to be done in order to make them compatible with our code.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Lessons Learned</H2>
+			<p align="justify">
+				Knowing what we know today, we would definitely have considered spending more time on the integer linear programming approaches we came across. We did go through the material and attempt to get a demo working but would have required much more time to achieve satisfactory results. 
+			</p>
+			<p align="justify">
+				We would also try to look for ways to implement optimal polygon intersection algorithms that could viably work on top of our visibility implementation. We did not have time to implement our own so we ended up experimenting with third party libraries instead, which proved to suffer from their own issues as well as added significant computational cost to an already unideal method overall.
+			</p>
+			<p align="justify">
+				Close to the end of our project, we discovered papers that took different approaches to finding the visibility for a point, some even mention approximate methods that lead to satisfactory results. Common methods mentioned were genetic algorithms and simulated annealing. We believe these methods could give interesting results that are worth looking into.
+			</p>
+			<p align="justify">
+				We learned that investing in creating a random polygon generator early on during the project would have helped in rapid testing of our algorithms on different shapes. We thought we could find a library to do this readily but later failed to do so. This is something that would have greatly enhanced our speed and ability to run tests and generate results quickly.
+			</p>
+			<p align="justify">
+				And finally, reducing our scope as much as possible early on might have helped. That would have led to us reading papers to do with the variants to the problem. The other side of the coin would be that we would not have found some of the important papers we stumbled upon later since it was our constant searching that unearthed papers that explained things in simpler terms as well as exposed us to different approaches.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">Possible Future Work</H2>
+			<p align="justify">
+				First thing to do would be to combine the visibility polygon approach with the triangulation and reflex approaches. Our triangulation and reflex approaches have been combined in a Python program but visibility currently functions entirely separately as a Javascript program. Since both were developed independently, we did not have the time to combine them yet. Combining them should not require to much effort, the process to generate visibility can directly be appended at the end of the triangulation and colouring process. In order to keep the application interactive, we recommend that Javascript be used for the final solution since interacting with the browser is much easier than having to deal with frameworks like Pygame for Python.
+			</p>
+			<p align="justify">
+				If someone was to start our project today, we recommend that they look more closely into quadrilateralization as well as solution for identifiably orthogonal polygons. Popular approaches seem to be just as computationally expensive as triangulation but the approaches we tried turned out to be much more complicated than expected. There are also more complicated convex partitioning algorithms that attempt to partition polygons in a generic fashion which we did not have the time to look at more closely.
+			</p>
+			<p align="justify">
+				A lot of the more modern methods to tackle the problem in an efficient manner seem to prefer approaching it as more of an optimization problem rather than one to do with geometry. They reduce it to a set cover space and then apply linear integer programming to solve it incrementally. Although we glanced at these methods, we did not attempt them as we chose the visibility approach instead.
+			</p>
+			<p align="justify">
+				For the visibility problem, several methods use approximation techniques with local search variations like simulated annealing and steepest ascent to arrive at the maximum possible visibility polygon in an area within a polygon. Other popular approaches that can be attempted include more sophisticated space partitioning data structures like BSPs to make the visibility computation faster and cheaper.
+			</p>
+			<p align="justify">
+				Our solution for visibility, can very easily be used as a viable component to solve the popular moving guards variant of the art gallery problem. The guards can be animated for a gallery, each movement will generate a new polygon whose overlap with others could be computed. And patrol paths can be arrived at for each guard so as to ensure every point in the gallery remains guarded at every point during the simulation. A machine learning algorithm to optimize for such a situation could be an interesting task. Reinforcement learning to arrive at the best paths seems like a good option. After several runs, the optimal path could be displayed.
+			</p>
+			<p align="justify">
+				We never got to look at guards with visibility constraints. This would only need small tweaks to the algorithm described earlier. We would need to first set a limit for visibility for each guard. If a particular vertex in the scene is found to lie beyond the decided limit, a vertex of the visibility polygon lies exactly at that much distance from the guard. This would complicate guard positioning but make for an interesting exercise along with very different visuals.
+			</p>
+			<p align="justify">
+				Finally, our visibility algorithm is also able to tackle visibility from points outside polygons as shown in some of the results above. This could be used to tackle the exterior visibility variant of the art gallery problem known as the fortress problem in the literature. Triangulation is known to be a viable approach here as well, albeit with the triangulations happening in a different manner instead of interior diagonals. We noticed some precision issues with our implementation that disallowed perfect vision both outside and inside the polygon when a guard is placed exactly at a vertex. The vision is always to one side on the exterior side, so many tweaks might be required if the exterior and interior visibility problem known as the prison yard problem were to be attempted with our technique.
+			</p>
+		</section>
+		<br>
+		<section>
+			<H2 align="center">References</H2>
+			<ol>
+				<li>
+					<cite>Joseph O'Rourke. <a href="http://cs.smith.edu/~jorourke/books/ArtGalleryTheorems/Art_Gallery_Full_Book.pdf">Art Gallery Theorems and Algorithms.</a></cite> (Possibly the best resource available for enthusiasts of problems in this domain).
+				</li>
+				<li>
+					<cite>de Rezende P.J., de Souza C.C., Friedrichs S., Hemmer M., Kröller A., Tozoni D.C. (2016). <a href="https://arxiv.org/abs/1410.8720">Engineering Art Galleries</a>. In: Kliemann L., Sanders P. (eds) Algorithm Engineering. Lecture Notes in Computer Science, vol 9220. Springer, Cham. Engineering Art Galleries.</cite>
+				</li>
+				<li>
+					<cite>Urrutia, Jorge. (2000). Art Gallery and Illumination Problems. Handbook of Computational Geometry. 10.1016/B978-044482537-7/50023-1. <a href="http://www.matem.unam.mx/urrutia/ArtBook.html/Completo.pdf">Art Gallery and Illumination Problems</a>.</cite>
+				</li>
+				<li>
+					<cite>Lee, D & K. Lin, Arthur. (1986). <a href="https://dl.acm.org/citation.cfm?id=13657">Computational Complexity of Art Gallery Problems</a>. IEEE Transactions on Information Theory. 32. 276-282. 10.1109/TIT.1986.1057165.</cite>
+				</li>
+				<li>
+					<cite>Hemanshu Kaul, IIT. <a href="http://www.math.iit.edu/~kaul/talks/LongArtGalleryTalk.pdf">The Art Gallery Problem</a>.</cite>
+				</li>
+				<li>
+					<cite>Purdue University. <a href="https://www.cs.purdue.edu/homes/aliaga/cs635-10/lec-artgallery.pdf">Art Gallery Theorems and Algorithms</a>.</cite>
+				</li>
+				<li>
+					<cite>Justin Iwerks, Joseph S. B. Mitchell. <a href="http://www.sciencedirect.com/science/article/pii/S0020019012001937">The art gallery theorem for simple polygons in terms of the number of reflex and convex vertices</a>.</cite>
+				</li>
+				<li>
+					<cite>Red Blob Games. <a href="https://www.redblobgames.com/articles/visibility/">Visibility</a>.</cite>
+				</li>
+				<li>
+					<cite>IIT Delhi. <a href="http://www.cse.iitd.ernet.in/~ssen/geomschool/nandy/Art-gallery-approximation.pdf">Approximation Algorithms for Art Gallery Problems</a>.</cite>
+				</li>
+				<li>
+					<cite>Erik Krohn. <a href="http://www.uwosh.edu/faculty_staff/krohne/papers/comprehensive.pdf">Survey of Terrain Guarding and Art Gallery Problems</a>.</cite>
+				</li>
+				<li>
+					<cite>Gorkem Safak. <a href="https://www.nada.kth.se/utbildning/grukth/exjobb/rapportlistor/2009/rapporter09/safak_gorkem_09126.pdf">The Art-Gallery Problem: A Survey and an Extension</a>.</cite>
+				</li>
+				<li>
+					<cite>Oleksandr Goncharov. <a href="https://github.com/vrd/js-intersect">Javascript library for intersection of polygons</a>.</cite>
+				</li>
+				<li>
+					<cite>Ernestus, M., Friedrichs, S., Hemmer, M. et al. J Glob Optim (2017) 68: 23. <a href="https://doi.org/10.1007/s10898-016-0452-2">Algorithms for Art Gallery Illumination</a>.</cite>
+				</li>
+				<li>
+					<cite>Édouard Bonnet, Tillmann Miltzow. <a href="https://arxiv.org/abs/1607.05527">An Approximation Algorithm for the Art Gallery Problem</a>.</cite>
+				</li>
+				<li>
+					<cite>Francisc Bungiu, Michael Hemmer, John Hershberger, Kan Huang, Alexander Kröller. <a href="https://arxiv.org/abs/1403.3905">Efficient Computation of Visibility Polygons</a>.</cite>
+				</li>
+				<li>
+					<cite>Mahdi Moeini , Daniel Schermer , Oliver Wendt. <a href="http://roadef2017.event.univ-lorraine.fr/abstracts/ROADEF2017_paper_187.pdf"> Mobile Guards to Oversee an Art Gallery</a>.</cite>
+				</li>
+				<li>
+					<cite>Pawel Zylinski. <a href="https://www.elibm.org/ft/960843">Orthogonal art galleries with holes: a coloring proof of Aggarwal’s Theorem</a>.</cite>
+				</li>
+				<li>
+					<cite>Bernard Chazelle. <a href="https://www.cs.princeton.edu/~chazelle/pubs/polygon-triang.pdf">Triangulating a Simple Polygon in Linear Time</a>.</cite>
+				</li>
+				<li>
+					<cite>Bajuelos, António & Canales, Santiago & Hernandez, Gregorio & Martins, Ana. (2008). <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.484.5649&rep=rep1&type=pdf">Optimizing the Minimum Vertex Guard Set on Simple Polygons via a Genetic Algorithm</a>.</cite>
+				</li>
+				<li>
+					<cite>Computational Geometry - Algorithms and Applications. 3rd Edition.<a href=""></a></cite>
+				</li>
+				<li>
+					<cite>Antonio Leslie Bajuelos Domínguez, Gregorio Hernández Peñalver, Santiago Canales Cano, Ana Mafalda Martins. <a href="http://sweet.ua.pt/leslie/Papers/MVGS_GNT.pdf">Minimum vertex guard problem for orthogonal polygons: a genetic approach</a>.</cite>
+				</li>
+				<li>
+					<cite>Tomás A.P., Bajuelos A.L. (2004). <a href="https://link.springer.com/chapter/10.1007/978-3-540-25945-9_36">Generating Random Orthogonal Polygons</a>. In: Conejo R., Urretavizcaya M., Pérez-de-la-Cruz JL. (eds) Current Topics in Artificial Intelligence. Lecture Notes in Computer Science, vol 3040. Springer, Berlin, Heidelberg. </cite>
+				</li>
+				<li>
+					<cite>Joseph O’Rourke, Mandira Virmani. <a href="http://cs.smith.edu/~jorourke/Papers/GenRandPoly.pdf">Generating Random Polygons</a>.</cite>
+				</li>
+				<li>
+					<cite>Wikipedia. <a href="https://en.wikipedia.org/wiki/Art_gallery_problem">The Art Gallery Problem</a>.</cite>
+				</li>
+				<li>
+					<cite>Wikipedia. <a href="https://en.wikipedia.org/wiki/Visibility_polygon">Visibility Polygon</a>.</cite>
+				</li>
+				<li>
+					<cite>Art Gallery Problem Library, by M. C. Couto, P. J. de Rezende and C. C. de Souza. <a href="http://www.ic.unicamp.br/~cid/Problem-instances/Art-Gallery/AGPVG/index.html">AGPLIB</a>.</cite>
+				</li>
+				<li>
+					<cite>Stackexchange. Picture of <a href="https://math.stackexchange.com/questions/249041/star-shaped-polygons">Convex fans</a>.</cite>
+				</li>
+				<li>
+					<cite>Kumar Ghosh, Subir. (2010). <a href="http://www.sciencedirect.com/science/article/pii/S0166218X09004855">Approximation algorithms for art gallery problems in polygons</a>. Discrete Applied Mathematics. 158. 718-722. 10.1016/j.dam.2009.12.004. </cite>
+				</li>
+			</ol>
 		</section>
 	</body>
 </html>
